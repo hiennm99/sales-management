@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Sale } from '../../types/Sale';
+import type { Sale } from '../../types/sale.ts';
 
 interface SaleFormProps {
     mode: 'add' | 'edit' | 'view';

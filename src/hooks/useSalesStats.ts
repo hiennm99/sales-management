@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { Sale } from '../types/Sale';
+import type { Sale } from '../types/sale.ts';
 
 export function useSalesStats(sales: Sale[]) {
     return useMemo(() => {

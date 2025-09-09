@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import type {ReactNode} from "react";
-import type { Sale } from '../types/Sale';
+import type { Sale } from '../types/sale.ts';
 import { mockSales } from '../data/mockSales';
 
 interface SalesContextType {

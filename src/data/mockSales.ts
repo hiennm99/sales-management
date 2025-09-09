@@ -1,4 +1,4 @@
-import type { Sale } from '../types/Sale';
+import type { Sale } from '../types/sale.ts';
 
 export const mockSales: Sale[] = [
     {
