@@ -72,7 +72,7 @@ export const Sidebar: React.FC = () => {
 
     // Filter menu items based on user role
     const visibleMenuItems = menuItems.filter(item =>
-        user && hasRole && item.roles.some(role => hasRole(role))
+        user && hasRole && item.roles.some(role => hasRole(role as any))
     );
 
     const getRoleGradient = (role: string) => {
