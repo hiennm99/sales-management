@@ -1,0 +1,37 @@
+export interface Sale {
+    id: string;
+    shopName: string;
+    orderId: string;
+    orderDate: string;
+    scheduledShipDate: string;
+    sku: string;
+    size: string;
+    quantity: number;
+    type: 'Rolled' | 'Stretched';
+    customerName: string;
+    customerAddress: string;
+    customerPhone: string;
+    customerNotes: string;
+    subtotal: number;
+    discount: number;
+    tax: number;
+    total: number;
+    exchangeRate: number;
+    totalVnd: number;
+    actualShipDate?: string;
+    internalTrackingNumber?: string;
+    shippingNote?: string;
+    shippingUnit?: string;
+    trackingNumber?: string;
+    shippingFee: number;
+    shippingExchangeRate: number;
+    shippingFeeVnd: number;
+    generalStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+    customerStatus: string;
+    factoryStatus: string;
+    deliveryStatus: string;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    updatedBy: string;
+}
