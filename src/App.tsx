@@ -3,8 +3,7 @@ import { SalesProvider } from './contexts/SalesContext';
 import { Sidebar } from './components/Layout/Sidebar';
 import { Dashboard } from './pages/Dashboard';
 import { SalesList } from './pages/SalesList';
-import { AddSale } from './pages/AddSale';
-import { EditSale } from './pages/EditSale';
+import { SaleFormPage } from './pages/SaleFormPage';
 import { Analytics } from './pages/Analytics';
 import { Settings } from './pages/Settings';
 
