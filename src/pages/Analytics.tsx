@@ -1,6 +1,6 @@
 import { useSales } from '../contexts/SalesContext';
 import { useSalesStats } from '../hooks/useSalesStats';
-import { StatsCard } from '../components/Dashboard/StatsCard';
+import { StatsCard } from '../components/dashboard/StatsCard';
 import {
     DollarSign,
     ShoppingCart,

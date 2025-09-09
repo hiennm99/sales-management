@@ -35,6 +35,6 @@ export const demoAccounts = [
         role: 'staff',
         credentials: { username: 'staff', password: 'staff123' },
         description: 'Basic sales operations access',
-        features: ['View Sales', 'Add Sales', 'Edit Own Sales', 'Basic Dashboard']
+        features: ['View Sales', 'Add Sales', 'Edit Own Sales', 'Basic dashboard']
     }
 ];

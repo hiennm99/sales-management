@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useSales } from '../contexts/SalesContext';
-import { SaleForm } from '../components/Forms/SaleForm';
+import { SaleForm } from '../components/forms/SaleForm';
 
 export const SaleFormPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();

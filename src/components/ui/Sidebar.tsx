@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router';
 import {
     LayoutDashboard,
-    BarChart3,
     Settings,
     Search,
     TrendingUp,
-    Users,
     Plus,
     Target,
     Zap,
     ChevronRight,
     Activity,
+    Package,
     DollarSign,
     ShoppingCart
 } from 'lucide-react';
@@ -42,21 +41,12 @@ export const Sidebar: React.FC = () => {
             color: 'from-blue-500 to-cyan-500'
         },
         {
-            id: 'analytics',
-            label: 'Analytics',
-            icon: BarChart3,
-            path: '/analytics',
-            roles: ['admin', 'manager'],
-            badge: null,
-            color: 'from-emerald-500 to-green-500'
-        },
-        {
-            id: 'users',
-            label: 'Users',
-            icon: Users,
-            path: '/users',
+            id: 'products',
+            label: 'Products',
+            icon: Package,
+            path: '/products',
             roles: ['admin'],
-            badge: 'New',
+            badge: null,
             color: 'from-orange-500 to-red-500'
         },
         {
@@ -72,7 +62,7 @@ export const Sidebar: React.FC = () => {
 
     // Filter menu items based on user role
     const visibleMenuItems = menuItems.filter(item =>
-        user && hasRole && item.roles.some(role => hasRole(role as any))
+        user && hasRole && item.roles.some(role => hasRole(role))
     );
 
     const getRoleGradient = (role: string) => {

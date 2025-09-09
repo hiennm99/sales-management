@@ -1,7 +1,7 @@
 import { useSales } from '../contexts/SalesContext';
 import { useSalesStats } from '../hooks/useSalesStats';
-import { StatsCard } from '../components/Dashboard/StatsCard';
-import { RecentOrders } from '../components/Dashboard/RecentOrders';
+import { StatsCard } from '../components/dashboard/StatsCard';
+import { RecentOrders } from '../components/dashboard/RecentOrders';
 import { useNavigate } from 'react-router';
 import {
     DollarSign,

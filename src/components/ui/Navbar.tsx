@@ -86,10 +86,10 @@ export function Navbar() {
     if (!user) return null;
 
     return (
-        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+        <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/60 shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    {/* Logo & Brand - Modern Design */}
+                    {/* Logo & Brand - Enhanced */}
                     <div className="flex items-center cursor-pointer group" onClick={() => navigate('/dashboard')}>
                         <div className="relative">
                             <div className="w-10 h-10 bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
@@ -98,32 +98,32 @@ export function Navbar() {
                             <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
                         </div>
                         <div className="ml-3">
-                            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                                 SalesFlow
                             </h1>
-                            <p className="text-xs text-gray-500 -mt-0.5">Sales Management</p>
+                            <p className="text-xs text-gray-600 -mt-0.5">Sales Management</p>
                         </div>
                     </div>
 
-                    {/* Search Bar - Glassmorphism Design */}
+                    {/* Search Bar - Better contrast */}
                     <div className="hidden md:flex flex-1 max-w-lg mx-8">
                         <div className="relative w-full group">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-violet-500 transition-colors" />
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-violet-600 transition-colors" />
                             <input
                                 type="text"
                                 placeholder="Search sales, customers, products..."
-                                className="w-full pl-12 pr-4 py-3 bg-gray-50/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 outline-none text-sm transition-all duration-300 hover:bg-gray-50 focus:bg-white/70"
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/60 outline-none text-sm transition-all duration-300 hover:bg-gray-100 focus:bg-white text-gray-800 placeholder-gray-500"
                             />
                             <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 to-blue-500/5 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
                         </div>
                     </div>
 
-                    {/* Right Side Icons - Modern Design */}
+                    {/* Right Side Icons - Better contrast */}
                     <div className="hidden md:flex items-center space-x-2">
                         {/* Theme Toggle */}
                         <button
                             onClick={() => setIsDarkMode(!isDarkMode)}
-                            className="p-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
+                            className="p-2.5 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
                         >
                             {isDarkMode ? (
                                 <Sun className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
@@ -132,11 +132,11 @@ export function Navbar() {
                             )}
                         </button>
 
-                        {/* Notifications - Modern Badge */}
+                        {/* Notifications - Better design */}
                         <div className="relative" ref={notificationRef}>
                             <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className="relative p-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
+                                className="relative p-2.5 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
                             >
                                 <Bell className="w-5 h-5 group-hover:animate-pulse" />
                                 {unreadNotifications > 0 && (
@@ -149,9 +149,9 @@ export function Navbar() {
                                 )}
                             </button>
 
-                            {/* Notifications Dropdown - Glassmorphism */}
+                            {/* Notifications Dropdown - White background */}
                             {showNotifications && (
-                                <div className="absolute right-0 mt-3 w-80 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-4 z-50 transform animate-in slide-in-from-top-2 duration-200">
+                                <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 py-4 z-50 transform animate-in slide-in-from-top-2 duration-200">
                                     <div className="px-4 pb-3 border-b border-gray-100">
                                         <h3 className="font-semibold text-gray-900 flex items-center">
                                             <Zap className="w-4 h-4 mr-2 text-violet-500" />
@@ -163,8 +163,8 @@ export function Navbar() {
                                             notifications.map((notification) => (
                                                 <div
                                                     key={notification.id}
-                                                    className={`px-4 py-3 hover:bg-gray-50/50 cursor-pointer transition-all duration-200 ${
-                                                        notification.unread ? 'bg-violet-50/50 border-l-2 border-violet-500' : ''
+                                                    className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-all duration-200 ${
+                                                        notification.unread ? 'bg-violet-50 border-l-2 border-violet-500' : ''
                                                     }`}
                                                 >
                                                     <p className="text-sm text-gray-900 font-medium">{notification.message}</p>
@@ -185,11 +185,11 @@ export function Navbar() {
                             )}
                         </div>
 
-                        {/* User Profile - Premium Design */}
+                        {/* User Profile - Better contrast */}
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                className="flex items-center space-x-3 p-2 text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 border border-transparent hover:border-gray-200/50 group"
+                                className="flex items-center space-x-3 p-2 text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 border border-transparent hover:border-gray-300/50 group"
                             >
                                 <div className="relative">
                                     <div className={`w-9 h-9 bg-gradient-to-br ${getRoleColor(user.role)} rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300`}>
@@ -201,64 +201,62 @@ export function Navbar() {
                                 </div>
                                 <div className="hidden sm:block text-left">
                                     <p className="text-sm font-medium text-gray-900 truncate max-w-32">{user.fullName}</p>
-                                    <p className="text-xs text-gray-500 truncate capitalize">{user.role}</p>
+                                    <p className="text-xs text-gray-600 truncate capitalize">{user.role}</p>
                                 </div>
-                                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
                                     isProfileOpen ? 'rotate-180' : ''
                                 }`} />
                             </button>
 
-                            {/* Profile Dropdown - Ultra Modern */}
+                            {/* Profile Dropdown - White background */}
                             {isProfileOpen && (
-                                <div className="absolute right-0 mt-3 w-80 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-4 z-50 transform animate-in slide-in-from-top-2 duration-200">
-                                    {/* User Header - Gradient Background */}
-                                    <div className={`px-6 py-4 mb-4 bg-gradient-to-br ${getRoleColor(user.role)} mx-4 rounded-xl text-white relative overflow-hidden`}>
-                                        <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
-                                        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
-                                        <div className="relative flex items-center space-x-3">
-                                            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-lg border border-slate-200 py-4 z-50 transform animate-in slide-in-from-top-2 duration-200">
+                                    {/* User Header - Simple design */}
+                                    <div className="px-6 py-4 mb-4 bg-slate-50 mx-4 rounded-lg">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-12 h-12 bg-slate-600 rounded-lg flex items-center justify-center">
                                                 <span className="text-white font-medium text-lg">
                                                     {user.fullName.charAt(0).toUpperCase()}
                                                 </span>
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-white truncate">{user.fullName}</p>
-                                                <p className="text-sm text-white/80 truncate">{user.email}</p>
+                                                <p className="font-semibold text-slate-800 truncate">{user.fullName}</p>
+                                                <p className="text-sm text-slate-500 truncate">{user.email}</p>
                                                 <div className="flex items-center mt-1">
-                                                    <Shield className="w-3 h-3 mr-1" />
-                                                    <span className="text-xs text-white/90 capitalize font-medium">{user.role}</span>
+                                                    <Shield className="w-3 h-3 mr-1 text-slate-400" />
+                                                    <span className="text-xs text-slate-500 capitalize font-medium">{user.role}</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="mt-3 flex items-center justify-between text-xs text-white/80">
+                                        <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
                                             <div className="flex items-center">
                                                 <Calendar className="w-3 h-3 mr-1" />
                                                 Member since {new Date(user.createdAt).getFullYear()}
                                             </div>
                                             {user.lastLoginAt && (
                                                 <div className="flex items-center">
-                                                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                                                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                                                     Online
                                                 </div>
                                             )}
                                         </div>
                                     </div>
 
-                                    {/* Menu Items - Clean Design */}
+                                    {/* Menu Items - Better contrast */}
                                     <div className="px-2">
                                         <button
                                             onClick={handleProfileClick}
-                                            className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 group"
+                                            className="w-full flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
                                         >
-                                            <User className="w-5 h-5 mr-3 text-gray-400 group-hover:text-violet-500" />
+                                            <User className="w-5 h-5 mr-3 text-gray-500 group-hover:text-violet-600" />
                                             <span className="font-medium">View Profile</span>
                                         </button>
                                         <button
                                             onClick={handleSettingsClick}
-                                            className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 group"
+                                            className="w-full flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
                                         >
-                                            <Settings className="w-5 h-5 mr-3 text-gray-400 group-hover:text-violet-500" />
+                                            <Settings className="w-5 h-5 mr-3 text-gray-500 group-hover:text-violet-600" />
                                             <span className="font-medium">Account Settings</span>
                                         </button>
                                     </div>
@@ -282,30 +280,30 @@ export function Navbar() {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                            className="p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
                         >
                             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
                     </div>
                 </div>
 
-                {/* Mobile Menu - Modern Design */}
+                {/* Mobile Menu - Better contrast */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden border-t border-gray-200/50 py-4 bg-white/90 backdrop-blur-xl">
+                    <div className="md:hidden border-t border-gray-200 py-4 bg-white/95 backdrop-blur-xl">
                         {/* Mobile Search */}
                         <div className="px-2 pb-4">
                             <div className="relative">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                                 <input
                                     type="text"
                                     placeholder="Search..."
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-2xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 outline-none text-sm"
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 outline-none text-sm text-gray-800"
                                 />
                             </div>
                         </div>
 
                         {/* User Info Mobile */}
-                        <div className="flex items-center space-x-3 px-4 py-3 bg-gray-50/50 rounded-2xl mx-2 mb-4">
+                        <div className="flex items-center space-x-3 px-4 py-3 bg-gray-50 rounded-2xl mx-2 mb-4">
                             <div className={`w-12 h-12 bg-gradient-to-br ${getRoleColor(user.role)} rounded-xl flex items-center justify-center shadow-lg`}>
                                 <span className="text-white font-medium">
                                     {user.fullName.charAt(0).toUpperCase()}
@@ -313,8 +311,8 @@ export function Navbar() {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="font-medium text-gray-900 truncate">{user.fullName}</p>
-                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
-                                <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-white rounded-full text-gray-600 mt-1">
+                                <p className="text-sm text-gray-600 truncate">{user.email}</p>
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-white rounded-full text-gray-700 mt-1 border border-gray-200">
                                     <Shield className="w-3 h-3 mr-1" />
                                     {user.role}
                                 </span>
@@ -323,7 +321,7 @@ export function Navbar() {
 
                         {/* Mobile Menu Items */}
                         <div className="space-y-1 px-2">
-                            <button className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200">
+                            <button className="w-full flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200">
                                 <Bell className="w-5 h-5 mr-3" />
                                 Notifications
                                 {unreadNotifications > 0 && (
@@ -334,14 +332,14 @@ export function Navbar() {
                             </button>
                             <button
                                 onClick={handleProfileClick}
-                                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                                className="w-full flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
                             >
                                 <User className="w-5 h-5 mr-3" />
                                 Profile
                             </button>
                             <button
                                 onClick={handleSettingsClick}
-                                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                                className="w-full flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
                             >
                                 <Settings className="w-5 h-5 mr-3" />
                                 Settings

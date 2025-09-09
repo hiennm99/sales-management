@@ -38,7 +38,7 @@ export interface AuthContextType extends AuthState {
     logout: () => Promise<void>;
     clearError: () => void;
     refreshUser: () => Promise<void>;
-    hasRole?: (requiredRole: 'admin' | 'manager' | 'staff') => boolean;
+    hasRole?: (requiredRole: string) => boolean;
     getSessionInfo?: () => SessionInfo | null;
 }
 
