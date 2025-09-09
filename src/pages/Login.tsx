@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, LogIn, User, Lock, AlertCircle } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router';
+import { Eye, EyeOff, LogIn, User, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import type { LoginCredentials } from '../types/auth';
 
 export function Login() {
-    const { login, isLoading, error, clearError } = useAuth();
+    const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const [formData, setFormData] = useState<LoginCredentials>({
         username: '',
         password: '',
@@ -16,17 +20,47 @@ export function Login() {
         username?: string;
         password?: string;
     }>({});
+    const [loginSuccess, setLoginSuccess] = useState(false);
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            const from = (location.state as any)?.from?.pathname || '/dashboard';
+            navigate(from, { replace: true });
+        }
+    }, [isAuthenticated, navigate, location]);
 
     // Clear error when component unmounts or form changes
     useEffect(() => {
         return () => clearError();
     }, [clearError]);
 
+    // Auto-fill demo credentials function
+    const fillDemoCredentials = (role: 'admin' | 'manager' | 'staff') => {
+        const credentials = {
+            admin: { username: 'admin', password: 'admin123' },
+            manager: { username: 'manager', password: 'manager123' },
+            staff: { username: 'staff', password: 'staff123' }
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            username: credentials[role].username,
+            password: credentials[role].password
+        }));
+
+        // Clear any existing errors
+        setValidationErrors({});
+        if (error) clearError();
+    };
+
     const validateForm = () => {
         const errors: { username?: string; password?: string } = {};
 
         if (!formData.username.trim()) {
             errors.username = 'Username is required';
+        } else if (formData.username.length < 3) {
+            errors.username = 'Username must be at least 3 characters';
         }
 
         if (!formData.password) {
@@ -68,13 +102,43 @@ export function Login() {
         setIsSubmitting(true);
         try {
             await login(formData);
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            setLoginSuccess(true);
+
+            // Success message will show briefly before redirect
+            setTimeout(() => {
+                const from = (location.state)?.from?.pathname || '/dashboard';
+                navigate(from, { replace: true });
+            }, 1000);
+
         } catch (err) {
             // Error is handled by context
+            console.error('Login failed:', err);
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !isSubmitting) {
+            handleSubmit(e);
+        }
+    };
+
+    // Show success state briefly
+    if (loginSuccess) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+                <div className="bg-slate-800/90 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 shadow-2xl text-center max-w-md w-full">
+                    <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="w-8 h-8 text-white" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Login Successful!</h2>
+                    <p className="text-slate-300 mb-4">Redirecting to dashboard...</p>
+                    <div className="w-8 h-8 border-4 border-purple-600/30 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
@@ -84,38 +148,59 @@ export function Login() {
             <div className="relative w-full max-w-md">
                 {/* Logo & Welcome */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-2xl mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl mb-4 shadow-lg">
                         <span className="text-white text-xl font-bold">SF</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Welcome to SalesFlow</h1>
-                    <p className="text-slate-400">Sign in to your account to continue</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">Welcome Back!</h1>
+                    <p className="text-slate-400">Sign in to access your SalesFlow dashboard</p>
                 </div>
 
                 {/* Demo Credentials Info */}
-                <div className="bg-blue-900/20 border border-blue-500/20 rounded-lg p-4 mb-6">
-                    <h3 className="text-blue-300 font-medium mb-2">Demo Accounts:</h3>
-                    <div className="text-sm text-blue-200 space-y-1">
-                        <div>👑 <strong>admin</strong> / admin123</div>
-                        <div>🏢 <strong>manager</strong> / manager123</div>
-                        <div>👤 <strong>staff</strong> / staff123</div>
+                <div className="bg-blue-900/20 border border-blue-500/20 rounded-lg p-4 mb-6 backdrop-blur-sm">
+                    <h3 className="text-blue-300 font-medium mb-3 text-center">Quick Demo Login:</h3>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                        <button
+                            onClick={() => fillDemoCredentials('admin')}
+                            className="bg-red-600/20 border border-red-500/30 rounded-lg p-2 text-red-200 hover:bg-red-600/30 transition-colors"
+                        >
+                            <div className="font-medium">👑 Admin</div>
+                            <div className="text-xs opacity-75">Full Access</div>
+                        </button>
+                        <button
+                            onClick={() => fillDemoCredentials('manager')}
+                            className="bg-blue-600/20 border border-blue-500/30 rounded-lg p-2 text-blue-200 hover:bg-blue-600/30 transition-colors"
+                        >
+                            <div className="font-medium">🏢 Manager</div>
+                            <div className="text-xs opacity-75">Analytics</div>
+                        </button>
+                        <button
+                            onClick={() => fillDemoCredentials('staff')}
+                            className="bg-green-600/20 border border-green-500/30 rounded-lg p-2 text-green-200 hover:bg-green-600/30 transition-colors"
+                        >
+                            <div className="font-medium">👤 Staff</div>
+                            <div className="text-xs opacity-75">Basic</div>
+                        </button>
                     </div>
                 </div>
 
                 {/* Login Form */}
                 <div className="bg-slate-800/90 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 shadow-2xl">
-                    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                    <form onSubmit={handleSubmit} className="space-y-6" noValidate onKeyDown={handleKeyDown}>
                         {/* Error Display */}
                         {error && (
-                            <div className="bg-red-900/20 border border-red-500/20 rounded-lg p-4 flex items-center gap-3" role="alert">
-                                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                                <span className="text-red-300 text-sm">{error}</span>
+                            <div className="bg-red-900/20 border border-red-500/20 rounded-lg p-4 flex items-start gap-3 animate-shake" role="alert">
+                                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                                <div>
+                                    <p className="text-red-300 text-sm font-medium">Login Failed</p>
+                                    <p className="text-red-200 text-sm mt-1">{error}</p>
+                                </div>
                             </div>
                         )}
 
                         {/* Username Field */}
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-2">
-                                Username
+                                Username <span className="text-red-400">*</span>
                             </label>
                             <div className="relative">
                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" aria-hidden="true" />
@@ -125,19 +210,21 @@ export function Login() {
                                     name="username"
                                     value={formData.username}
                                     onChange={handleInputChange}
-                                    className={`w-full bg-slate-700 text-white rounded-lg pl-11 pr-4 py-3 border transition-colors ${
+                                    className={`w-full bg-slate-700/50 text-white rounded-lg pl-11 pr-4 py-3 border transition-all duration-200 ${
                                         validationErrors.username
-                                            ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                                            ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-900/10'
                                             : 'border-slate-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20'
-                                    }`}
+                                    } backdrop-blur-sm`}
                                     placeholder="Enter your username"
                                     required
                                     autoComplete="username"
                                     aria-describedby={validationErrors.username ? "username-error" : undefined}
+                                    disabled={isSubmitting || isLoading}
                                 />
                             </div>
                             {validationErrors.username && (
-                                <p id="username-error" className="mt-2 text-sm text-red-400">
+                                <p id="username-error" className="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
                                     {validationErrors.username}
                                 </p>
                             )}
@@ -146,7 +233,7 @@ export function Login() {
                         {/* Password Field */}
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
-                                Password
+                                Password <span className="text-red-400">*</span>
                             </label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" aria-hidden="true" />
@@ -156,52 +243,65 @@ export function Login() {
                                     name="password"
                                     value={formData.password}
                                     onChange={handleInputChange}
-                                    className={`w-full bg-slate-700 text-white rounded-lg pl-11 pr-12 py-3 border transition-colors ${
+                                    className={`w-full bg-slate-700/50 text-white rounded-lg pl-11 pr-12 py-3 border transition-all duration-200 ${
                                         validationErrors.password
-                                            ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
+                                            ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-900/10'
                                             : 'border-slate-600 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20'
-                                    }`}
+                                    } backdrop-blur-sm`}
                                     placeholder="Enter your password"
                                     required
                                     autoComplete="current-password"
                                     aria-describedby={validationErrors.password ? "password-error" : undefined}
+                                    disabled={isSubmitting || isLoading}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors disabled:opacity-50"
                                     aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                    disabled={isSubmitting || isLoading}
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                             </div>
                             {validationErrors.password && (
-                                <p id="password-error" className="mt-2 text-sm text-red-400">
+                                <p id="password-error" className="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
                                     {validationErrors.password}
                                 </p>
                             )}
                         </div>
 
-                        {/* Remember Me */}
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                name="rememberMe"
-                                id="rememberMe"
-                                checked={formData.rememberMe}
-                                onChange={handleInputChange}
-                                className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
-                            />
-                            <label htmlFor="rememberMe" className="ml-3 text-sm text-slate-300">
-                                Remember me for 30 days
-                            </label>
+                        {/* Remember Me & Forgot Password */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    name="rememberMe"
+                                    id="rememberMe"
+                                    checked={formData.rememberMe}
+                                    onChange={handleInputChange}
+                                    className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
+                                    disabled={isSubmitting || isLoading}
+                                />
+                                <label htmlFor="rememberMe" className="ml-3 text-sm text-slate-300">
+                                    Remember me
+                                </label>
+                            </div>
+                            <button
+                                type="button"
+                                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                                disabled={isSubmitting || isLoading}
+                            >
+                                Forgot password?
+                            </button>
                         </div>
 
                         {/* Login Button */}
                         <button
                             type="submit"
                             disabled={isSubmitting || isLoading}
-                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg py-3 font-semibold hover:from-purple-700 hover:to-blue-700 focus:ring-4 focus:ring-purple-500/25 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg py-3 font-semibold hover:from-purple-700 hover:to-blue-700 focus:ring-4 focus:ring-purple-500/25 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform active:scale-95"
                         >
                             {isSubmitting || isLoading ? (
                                 <>
@@ -211,19 +311,16 @@ export function Login() {
                             ) : (
                                 <>
                                     <LogIn className="w-5 h-5" />
-                                    Sign In
+                                    Sign In to SalesFlow
                                 </>
                             )}
                         </button>
 
-                        {/* Footer Links */}
-                        <div className="text-center pt-4">
-                            <button
-                                type="button"
-                                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-                            >
-                                Forgot your password?
-                            </button>
+                        {/* Additional Info */}
+                        <div className="text-center pt-4 space-y-2">
+                            <p className="text-xs text-slate-400">
+                                By signing in, you agree to our Terms of Service and Privacy Policy
+                            </p>
                         </div>
                     </form>
                 </div>
@@ -231,10 +328,27 @@ export function Login() {
                 {/* Footer */}
                 <div className="text-center mt-8">
                     <p className="text-slate-400 text-sm">
-                        © 2024 SalesFlow. Modern Sales Management System.
+                        © 2024 SalesFlow. Secure Sales Management System.
                     </p>
+                    <div className="flex items-center justify-center space-x-4 mt-2 text-xs text-slate-500">
+                        <span>🔒 Secure Login</span>
+                        <span>⚡ Fast Performance</span>
+                        <span>📱 Mobile Ready</span>
+                    </div>
                 </div>
             </div>
+
+            {/* Custom Animation Styles */}
+            <style>{`
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+                    20%, 40%, 60%, 80% { transform: translateX(2px); }
+                }
+                .animate-shake {
+                    animation: shake 0.5s ease-in-out;
+                }
+            `}</style>
         </div>
     );
 }

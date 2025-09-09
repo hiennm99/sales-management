@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import {useAuth} from "../../contexts/AuthContext.tsx";
+import { useNavigate } from 'react-router';
+import { useAuth } from "../../contexts/AuthContext";
 import {
     LogOut,
     User,
@@ -7,20 +8,38 @@ import {
     Bell,
     ChevronDown,
     Menu,
-    X
+    X,
+    Search,
+    Shield,
+    Calendar,
+    Zap,
+    Sun,
+    Moon
 } from 'lucide-react';
 
 export function Navbar() {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [notifications] = useState([
+        { id: 1, message: "New sale recorded: $2,500", time: "2 min ago", unread: true },
+        { id: 2, message: "Monthly report is ready", time: "1 hour ago", unread: false },
+        { id: 3, message: "Team meeting in 30 minutes", time: "30 min ago", unread: true },
+    ]);
+    const [showNotifications, setShowNotifications] = useState(false);
 
-    // Close dropdown when clicking outside
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const notificationRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsProfileOpen(false);
+            }
+            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+                setShowNotifications(false);
             }
         }
 
@@ -28,114 +47,230 @@ export function Navbar() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        try {
+            await logout();
+            setIsProfileOpen(false);
+            setIsMobileMenuOpen(false);
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
+
+    const handleProfileClick = () => {
         setIsProfileOpen(false);
+        navigate('/profile');
+    };
+
+    const handleSettingsClick = () => {
+        setIsProfileOpen(false);
+        navigate('/settings');
     };
 
     const getRoleColor = (role: string) => {
         switch (role.toLowerCase()) {
             case 'admin':
-                return 'bg-red-100 text-red-800';
+                return 'from-red-500 to-pink-500';
             case 'manager':
-                return 'bg-blue-100 text-blue-800';
+                return 'from-blue-500 to-cyan-500';
             case 'staff':
-                return 'bg-green-100 text-green-800';
+                return 'from-green-500 to-emerald-500';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'from-gray-500 to-slate-500';
         }
     };
+
+    const unreadNotifications = notifications.filter(n => n.unread).length;
 
     if (!user) return null;
 
     return (
-        <nav className="bg-white border-b border-gray-200 shadow-sm">
+        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    {/* Logo & Brand */}
-                    <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-white text-sm font-bold">SF</span>
+                    {/* Logo & Brand - Modern Design */}
+                    <div className="flex items-center cursor-pointer group" onClick={() => navigate('/dashboard')}>
+                        <div className="relative">
+                            <div className="w-10 h-10 bg-gradient-to-br from-violet-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                                <span className="text-white text-lg font-bold">S</span>
+                            </div>
+                            <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
                         </div>
-                        <h1 className="text-xl font-semibold text-gray-900">SalesFlow</h1>
+                        <div className="ml-3">
+                            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                                SalesFlow
+                            </h1>
+                            <p className="text-xs text-gray-500 -mt-0.5">Sales Management</p>
+                        </div>
                     </div>
 
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-4">
-                        {/* Notifications */}
-                        <button className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
-                            <Bell className="w-5 h-5" />
+                    {/* Search Bar - Glassmorphism Design */}
+                    <div className="hidden md:flex flex-1 max-w-lg mx-8">
+                        <div className="relative w-full group">
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-violet-500 transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="Search sales, customers, products..."
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 outline-none text-sm transition-all duration-300 hover:bg-gray-50 focus:bg-white/70"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 to-blue-500/5 rounded-2xl opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
+                        </div>
+                    </div>
+
+                    {/* Right Side Icons - Modern Design */}
+                    <div className="hidden md:flex items-center space-x-2">
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={() => setIsDarkMode(!isDarkMode)}
+                            className="p-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
+                        >
+                            {isDarkMode ? (
+                                <Sun className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+                            ) : (
+                                <Moon className="w-5 h-5 group-hover:-rotate-12 transition-transform duration-300" />
+                            )}
                         </button>
 
-                        {/* User Profile Dropdown */}
+                        {/* Notifications - Modern Badge */}
+                        <div className="relative" ref={notificationRef}>
+                            <button
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                className="relative p-2.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
+                            >
+                                <Bell className="w-5 h-5 group-hover:animate-pulse" />
+                                {unreadNotifications > 0 && (
+                                    <div className="absolute -top-1 -right-1">
+                                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-xs font-medium text-white shadow-lg animate-pulse">
+                                            {unreadNotifications}
+                                        </span>
+                                        <span className="absolute top-0 right-0 h-5 w-5 rounded-full bg-gradient-to-r from-red-400 to-pink-400 opacity-75 animate-ping"></span>
+                                    </div>
+                                )}
+                            </button>
+
+                            {/* Notifications Dropdown - Glassmorphism */}
+                            {showNotifications && (
+                                <div className="absolute right-0 mt-3 w-80 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-4 z-50 transform animate-in slide-in-from-top-2 duration-200">
+                                    <div className="px-4 pb-3 border-b border-gray-100">
+                                        <h3 className="font-semibold text-gray-900 flex items-center">
+                                            <Zap className="w-4 h-4 mr-2 text-violet-500" />
+                                            Notifications
+                                        </h3>
+                                    </div>
+                                    <div className="max-h-96 overflow-y-auto">
+                                        {notifications.length > 0 ? (
+                                            notifications.map((notification) => (
+                                                <div
+                                                    key={notification.id}
+                                                    className={`px-4 py-3 hover:bg-gray-50/50 cursor-pointer transition-all duration-200 ${
+                                                        notification.unread ? 'bg-violet-50/50 border-l-2 border-violet-500' : ''
+                                                    }`}
+                                                >
+                                                    <p className="text-sm text-gray-900 font-medium">{notification.message}</p>
+                                                    <p className="text-xs text-gray-500 mt-1 flex items-center">
+                                                        <div className="w-1 h-1 bg-gray-400 rounded-full mr-2"></div>
+                                                        {notification.time}
+                                                    </p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="px-4 py-8 text-center text-gray-500">
+                                                <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                                                <p>No notifications</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* User Profile - Premium Design */}
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                className="flex items-center space-x-3 p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="flex items-center space-x-3 p-2 text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 border border-transparent hover:border-gray-200/50 group"
                             >
-                                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                                    <span className="text-white text-sm font-medium">
-                                        {user.fullName.charAt(0).toUpperCase()}
-                                    </span>
+                                <div className="relative">
+                                    <div className={`w-9 h-9 bg-gradient-to-br ${getRoleColor(user.role)} rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300`}>
+                                        <span className="text-white text-sm font-medium">
+                                            {user.fullName.charAt(0).toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                                 </div>
                                 <div className="hidden sm:block text-left">
-                                    <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
-                                    <p className="text-xs text-gray-500">{user.email}</p>
+                                    <p className="text-sm font-medium text-gray-900 truncate max-w-32">{user.fullName}</p>
+                                    <p className="text-xs text-gray-500 truncate capitalize">{user.role}</p>
                                 </div>
-                                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
+                                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                                    isProfileOpen ? 'rotate-180' : ''
+                                }`} />
                             </button>
 
-                            {/* Dropdown Menu */}
+                            {/* Profile Dropdown - Ultra Modern */}
                             {isProfileOpen && (
-                                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                                    {/* User Info */}
-                                    <div className="px-4 py-3 border-b border-gray-100">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                                                <span className="text-white font-medium">
+                                <div className="absolute right-0 mt-3 w-80 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-4 z-50 transform animate-in slide-in-from-top-2 duration-200">
+                                    {/* User Header - Gradient Background */}
+                                    <div className={`px-6 py-4 mb-4 bg-gradient-to-br ${getRoleColor(user.role)} mx-4 rounded-xl text-white relative overflow-hidden`}>
+                                        <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
+                                        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
+                                        <div className="relative flex items-center space-x-3">
+                                            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                                <span className="text-white font-medium text-lg">
                                                     {user.fullName.charAt(0).toUpperCase()}
                                                 </span>
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="font-medium text-gray-900">{user.fullName}</p>
-                                                <p className="text-sm text-gray-500">{user.email}</p>
-                                                <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full mt-1 ${getRoleColor(user.role)}`}>
-                                                    {user.role}
-                                                </span>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-semibold text-white truncate">{user.fullName}</p>
+                                                <p className="text-sm text-white/80 truncate">{user.email}</p>
+                                                <div className="flex items-center mt-1">
+                                                    <Shield className="w-3 h-3 mr-1" />
+                                                    <span className="text-xs text-white/90 capitalize font-medium">{user.role}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        {user.department && (
-                                            <p className="text-xs text-gray-500 mt-2">
-                                                📁 {user.department}
-                                            </p>
-                                        )}
-                                        {user.lastLoginAt && (
-                                            <p className="text-xs text-gray-400 mt-1">
-                                                Last login: {new Date(user.lastLoginAt).toLocaleString()}
-                                            </p>
-                                        )}
+
+                                        <div className="mt-3 flex items-center justify-between text-xs text-white/80">
+                                            <div className="flex items-center">
+                                                <Calendar className="w-3 h-3 mr-1" />
+                                                Member since {new Date(user.createdAt).getFullYear()}
+                                            </div>
+                                            {user.lastLoginAt && (
+                                                <div className="flex items-center">
+                                                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                                                    Online
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* Menu Items */}
-                                    <div className="py-1">
-                                        <button className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                            <User className="w-4 h-4 mr-3" />
-                                            View Profile
+                                    {/* Menu Items - Clean Design */}
+                                    <div className="px-2">
+                                        <button
+                                            onClick={handleProfileClick}
+                                            className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 group"
+                                        >
+                                            <User className="w-5 h-5 mr-3 text-gray-400 group-hover:text-violet-500" />
+                                            <span className="font-medium">View Profile</span>
                                         </button>
-                                        <button className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                            <Settings className="w-4 h-4 mr-3" />
-                                            Settings
+                                        <button
+                                            onClick={handleSettingsClick}
+                                            className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 group"
+                                        >
+                                            <Settings className="w-5 h-5 mr-3 text-gray-400 group-hover:text-violet-500" />
+                                            <span className="font-medium">Account Settings</span>
                                         </button>
                                     </div>
 
-                                    {/* Logout */}
-                                    <div className="border-t border-gray-100 pt-1">
+                                    {/* Logout - Danger Zone */}
+                                    <div className="border-t border-gray-100 mt-4 pt-4 px-2">
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                            className="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group"
                                         >
-                                            <LogOut className="w-4 h-4 mr-3" />
-                                            Sign Out
+                                            <LogOut className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                                            <span className="font-medium">Sign Out</span>
                                         </button>
                                     </div>
                                 </div>
@@ -147,52 +282,77 @@ export function Navbar() {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg"
+                            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200"
                         >
                             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
+                {/* Mobile Menu - Modern Design */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden border-t border-gray-200 py-4">
-                        <div className="space-y-3">
-                            {/* User Info Mobile */}
-                            <div className="flex items-center space-x-3 px-2">
-                                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                                    <span className="text-white font-medium">
-                                        {user.fullName.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-900">{user.fullName}</p>
-                                    <p className="text-sm text-gray-500">{user.email}</p>
-                                </div>
+                    <div className="md:hidden border-t border-gray-200/50 py-4 bg-white/90 backdrop-blur-xl">
+                        {/* Mobile Search */}
+                        <div className="px-2 pb-4">
+                            <div className="relative">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-2xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 outline-none text-sm"
+                                />
                             </div>
+                        </div>
 
-                            {/* Mobile Menu Items */}
-                            <div className="space-y-1">
-                                <button className="w-full flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
-                                    <Bell className="w-4 h-4 mr-3" />
-                                    Notifications
-                                </button>
-                                <button className="w-full flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
-                                    <User className="w-4 h-4 mr-3" />
-                                    Profile
-                                </button>
-                                <button className="w-full flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
-                                    <Settings className="w-4 h-4 mr-3" />
-                                    Settings
-                                </button>
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full flex items-center px-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
-                                >
-                                    <LogOut className="w-4 h-4 mr-3" />
-                                    Sign Out
-                                </button>
+                        {/* User Info Mobile */}
+                        <div className="flex items-center space-x-3 px-4 py-3 bg-gray-50/50 rounded-2xl mx-2 mb-4">
+                            <div className={`w-12 h-12 bg-gradient-to-br ${getRoleColor(user.role)} rounded-xl flex items-center justify-center shadow-lg`}>
+                                <span className="text-white font-medium">
+                                    {user.fullName.charAt(0).toUpperCase()}
+                                </span>
                             </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-medium text-gray-900 truncate">{user.fullName}</p>
+                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                                <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-white rounded-full text-gray-600 mt-1">
+                                    <Shield className="w-3 h-3 mr-1" />
+                                    {user.role}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Mobile Menu Items */}
+                        <div className="space-y-1 px-2">
+                            <button className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200">
+                                <Bell className="w-5 h-5 mr-3" />
+                                Notifications
+                                {unreadNotifications > 0 && (
+                                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                                        {unreadNotifications}
+                                    </span>
+                                )}
+                            </button>
+                            <button
+                                onClick={handleProfileClick}
+                                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                            >
+                                <User className="w-5 h-5 mr-3" />
+                                Profile
+                            </button>
+                            <button
+                                onClick={handleSettingsClick}
+                                className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                            >
+                                <Settings className="w-5 h-5 mr-3" />
+                                Settings
+                            </button>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                            >
+                                <LogOut className="w-5 h-5 mr-3" />
+                                Sign Out
+                            </button>
                         </div>
                     </div>
                 )}
