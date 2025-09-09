@@ -1,25 +1,22 @@
+// src/components/Layout/Sidebar.tsx
 import React from 'react';
+import { NavLink, useLocation } from 'react-router';
 import {
     LayoutDashboard,
     List,
-    Plus,
     BarChart3,
     Settings,
     Search
 } from 'lucide-react';
 
-interface SidebarProps {
-    currentPage: string;
-    onPageChange: (page: string) => void;
-}
+export const Sidebar: React.FC = () => {
+    const location = useLocation();
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) => {
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'sales-list', label: 'Sales List', icon: List },
-        { id: 'add-sale', label: 'Add Sale', icon: Plus },
-        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-        { id: 'settings', label: 'Settings', icon: Settings },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'sales-list', label: 'Sales List', icon: List, path: '/sales' },
+        { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analytics' },
+        { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
     ];
 
     return (
@@ -41,29 +38,41 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
                     <input
                         type="text"
                         placeholder="Search..."
-                        className="w-full bg-slate-700 rounded-lg pl-10 pr-4 py-2 text-sm"
+                        className="w-full bg-slate-700 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
                     />
                 </div>
 
                 <nav className="space-y-2">
                     {menuItems.map((item) => {
                         const Icon = item.icon;
+                        const isActive = location.pathname === item.path ||
+                            (item.path === '/sales' && location.pathname.startsWith('/sales'));
+
                         return (
-                            <button
+                            <NavLink
                                 key={item.id}
-                                onClick={() => onPageChange(item.id)}
-                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                                    currentPage === item.id
-                                        ? 'bg-purple-600 text-white'
-                                        : 'text-slate-300 hover:bg-slate-700'
-                                }`}
+                                to={item.path}
+                                className={({ isActive: navIsActive }) => `
+                                    w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors
+                                    ${isActive || navIsActive
+                                    ? 'bg-purple-600 text-white'
+                                    : 'text-slate-300 hover:bg-slate-700'
+                                }
+                                `}
                             >
                                 <Icon className="w-4 h-4" />
                                 {item.label}
-                            </button>
+                            </NavLink>
                         );
                     })}
                 </nav>
+
+                {/* Quick Stats */}
+                <div className="mt-8 p-3 bg-slate-700 rounded-lg">
+                    <p className="text-xs text-slate-400 mb-2">Today's Sales</p>
+                    <p className="text-lg font-semibold text-white">$2,847</p>
+                    <p className="text-xs text-green-400">↗ +12.5%</p>
+                </div>
             </div>
         </div>
     );
