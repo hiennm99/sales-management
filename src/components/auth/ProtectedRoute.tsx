@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router';
-import { Login } from '../../pages/Login';
+import { LoginPage } from '../../pages/LoginPage.tsx';
 import {
     Shield,
     AlertTriangle,
@@ -59,7 +59,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     // Not authenticated - redirect to login with return path
     if (!isAuthenticated || !user) {
-        return <Login />;
+        return <LoginPage />;
     }
 
     // Role-based access control

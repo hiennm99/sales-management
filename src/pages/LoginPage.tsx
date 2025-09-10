@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router';
 import { Eye, EyeOff, LogIn, User, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import type { LoginCredentials } from '../types/auth';
 
-export function Login() {
+export function LoginPage() {
     const { login, isLoading, error, clearError, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -112,7 +112,7 @@ export function Login() {
 
         } catch (err) {
             // Error is handled by context
-            console.error('Login failed:', err);
+            console.error('LoginPage failed:', err);
         } finally {
             setIsSubmitting(false);
         }
@@ -183,7 +183,7 @@ export function Login() {
                     </div>
                 </div>
 
-                {/* Login Form */}
+                {/* LoginPage Form */}
                 <div className="bg-slate-800/90 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 shadow-2xl">
                     <form onSubmit={handleSubmit} className="space-y-6" noValidate onKeyDown={handleKeyDown}>
                         {/* Error Display */}
@@ -297,7 +297,7 @@ export function Login() {
                             </button>
                         </div>
 
-                        {/* Login Button */}
+                        {/* LoginPage Button */}
                         <button
                             type="submit"
                             disabled={isSubmitting || isLoading}

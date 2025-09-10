@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from "react";
 import type { AuthContextType, User, LoginCredentials, AuthState } from '../types/auth';
-import {mockUsers} from "../types/auth";
+import {mockUsers} from "../data/mockUsers.tsx";
 import { mockCredentials } from "../data/mockCredentials";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -10,6 +11,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const SESSION_TIMEOUT = 30 * 60 * 1000;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+    const queryClient = useQueryClient();
     const [authState, setAuthState] = useState<AuthState>({
         user: null,
         isAuthenticated: false,
@@ -20,16 +22,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Session timeout handler
     const handleSessionTimeout = useCallback(() => {
         console.log('Session timed out');
+
+        // Clear localStorage
         localStorage.removeItem('salesflow_user');
         localStorage.removeItem('salesflow_token');
         localStorage.removeItem('salesflow_session_start');
+        localStorage.removeItem('salesflow_current_shop_id');
+
+        // Clear all React Query cache on logout
+        queryClient.clear();
+
         setAuthState({
             user: null,
             isAuthenticated: false,
             isLoading: false,
             error: 'Session expired. Please login again.'
         });
-    }, []);
+    }, [queryClient]);
 
     // Check session validity
     const isSessionValid = useCallback(() => {
@@ -89,10 +98,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                             error: null
                         });
                     } else {
-                        // User no longer exists or is inactive
+                        // User no longer exists or is inactive - clear everything
                         localStorage.removeItem('salesflow_user');
                         localStorage.removeItem('salesflow_token');
                         localStorage.removeItem('salesflow_session_start');
+                        localStorage.removeItem('salesflow_current_shop_id');
+                        queryClient.clear();
+
                         setAuthState(prev => ({
                             ...prev,
                             isLoading: false,
@@ -100,10 +112,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         }));
                     }
                 } else {
-                    // Invalid or expired session
+                    // Invalid or expired session - clear everything
                     localStorage.removeItem('salesflow_user');
                     localStorage.removeItem('salesflow_token');
                     localStorage.removeItem('salesflow_session_start');
+                    localStorage.removeItem('salesflow_current_shop_id');
+                    queryClient.clear();
+
                     setAuthState(prev => ({
                         ...prev,
                         isLoading: false
@@ -111,9 +126,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }
             } catch (error) {
                 console.error('Error checking existing session:', error);
-                localStorage.removeItem('salesflow_user');
-                localStorage.removeItem('salesflow_token');
-                localStorage.removeItem('salesflow_session_start');
+
+                // Clear everything on error
+                localStorage.clear();
+                queryClient.clear();
+
                 setAuthState(prev => ({
                     ...prev,
                     isLoading: false,
@@ -123,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
 
         checkExistingSession();
-    }, [isSessionValid]);
+    }, [isSessionValid, queryClient]);
 
     const login = async (credentials: LoginCredentials): Promise<void> => {
         setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -134,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 throw new Error('Please provide both username and password');
             }
 
-            // Simulate API call delay (more realistic)
+            // Simulate API call delay
             await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
 
             // Check credentials
@@ -163,20 +180,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 lastLoginAt: new Date().toISOString()
             };
 
-            // Generate mock token with more realistic structure
+            // Generate token
             const token = `sf_${user.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             const sessionStart = Date.now().toString();
 
-            // Save to localStorage if remember me or session
+            // Save to localStorage
             localStorage.setItem('salesflow_user', JSON.stringify(updatedUser));
             localStorage.setItem('salesflow_token', token);
             localStorage.setItem('salesflow_session_start', sessionStart);
 
-            // If not remember me, set shorter session
+            // Handle remember me
             if (!credentials.rememberMe) {
-                // Session will expire when browser closes or after timeout
                 sessionStorage.setItem('salesflow_temp_session', 'true');
             }
+
+            // Clear any existing React Query cache and start fresh
+            queryClient.clear();
 
             setAuthState({
                 user: updatedUser,
@@ -209,7 +228,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             localStorage.removeItem('salesflow_user');
             localStorage.removeItem('salesflow_token');
             localStorage.removeItem('salesflow_session_start');
+            localStorage.removeItem('salesflow_current_shop_id');
             sessionStorage.removeItem('salesflow_temp_session');
+
+            // Clear all React Query cache
+            queryClient.clear();
 
             // Reset auth state
             setAuthState({
@@ -226,6 +249,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Force logout even if there's an error
             localStorage.clear();
             sessionStorage.clear();
+            queryClient.clear();
+
             setAuthState({
                 user: null,
                 isAuthenticated: false,
@@ -233,7 +258,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 error: null
             });
         }
-    }, []);
+    }, [queryClient]);
 
     const clearError = useCallback(() => {
         setAuthState(prev => ({ ...prev, error: null }));
@@ -278,7 +303,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    // Check if user has specific role or higher
     const hasRole = useCallback((requiredRole: 'admin' | 'manager' | 'staff'): boolean => {
         if (!authState.user) return false;
 
@@ -311,8 +335,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         clearError,
         refreshUser,
-        hasRole,
-        getSessionInfo
+        getSessionInfo,
+        hasRole
     };
 
     return (
@@ -334,8 +358,8 @@ export function useAuth() {
 export function useRole(requiredRole: 'admin' | 'manager' | 'staff') {
     const { user, hasRole } = useAuth();
     return {
-        hasRequiredRole: hasRole?.(requiredRole) ?? false,
-        userRole: user?.role,
-        isAuthenticated: !!user
+        hasRequiredRole: hasRole(requiredRole),
+        currentRole: user?.role,
+        isLoading: !user
     };
 }

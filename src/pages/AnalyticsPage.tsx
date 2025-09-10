@@ -1,4 +1,4 @@
-import { useSales } from '../contexts/SalesContext';
+import { useSales } from '../contexts/SalesContext.tsx';
 import { useSalesStats } from '../hooks/useSalesStats';
 import { StatsCard } from '../components/dashboard/StatsCard';
 import {
@@ -10,7 +10,7 @@ import {
     Calendar
 } from 'lucide-react';
 
-export function Analytics() {
+export function AnalyticsPage() {
     const { sales } = useSales();
     const stats = useSalesStats(sales);
 

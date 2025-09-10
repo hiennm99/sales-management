@@ -1,54 +1,27 @@
-import type { Sale } from '../types/sale.ts';
-
-export function calculateSaleTotal(
-    subtotal: number,
-    discount: number = 0,
-    tax: number = 0
-): number {
-    return subtotal - discount + tax;
-}
-
-export function calculateVndTotal(
-    usdAmount: number,
-    exchangeRate: number
-): number {
-    return usdAmount * exchangeRate;
-}
-
-export function formatCurrency(amount: number, currency: 'USD' | 'VND' = 'USD'): string {
-    if (currency === 'VND') {
-        return `₫${amount.toLocaleString()}`;
-    }
-    return `$${amount.toFixed(2)}`;
-}
-
-export function getStatusColor(status: Sale['generalStatus']): string {
+// utils/salesCalculations.ts
+export function getStatusColor(status: string): string {
     switch (status) {
-        case 'delivered':
-            return 'bg-green-100 text-green-800';
-        case 'shipped':
-            return 'bg-blue-100 text-blue-800';
         case 'processing':
-            return 'bg-orange-100 text-orange-800';
-        case 'pending':
-            return 'bg-yellow-100 text-yellow-800';
+            return 'bg-blue-100 text-blue-800 border-blue-200';
+        case 'shipped':
+            return 'bg-purple-100 text-purple-800 border-purple-200';
+        case 'delivered':
+            return 'bg-green-100 text-green-800 border-green-200';
         case 'cancelled':
-            return 'bg-red-100 text-red-800';
+            return 'bg-red-100 text-red-800 border-red-200';
         default:
-            return 'bg-gray-100 text-gray-800';
+            return 'bg-gray-100 text-gray-800 border-gray-200';
     }
 }
 
-export function getStatusDotColor(status: Sale['generalStatus']): string {
+export function getStatusDotColor(status: string): string {
     switch (status) {
+        case 'processing':
+            return 'bg-blue-500';
+        case 'shipped':
+            return 'bg-purple-500';
         case 'delivered':
             return 'bg-green-500';
-        case 'shipped':
-            return 'bg-blue-500';
-        case 'processing':
-            return 'bg-orange-500';
-        case 'pending':
-            return 'bg-yellow-500';
         case 'cancelled':
             return 'bg-red-500';
         default:

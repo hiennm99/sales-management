@@ -1,3 +1,5 @@
+// src/components/layout/Navbar.tsx
+
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from "../../contexts/AuthContext";
@@ -86,7 +88,8 @@ export function Navbar() {
     if (!user) return null;
 
     return (
-        <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/60 shadow-lg">
+        // --- LOGIC MỚI: Giảm z-index từ 50 xuống 40 ---
+        <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-200/60 shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo & Brand - Enhanced */}
